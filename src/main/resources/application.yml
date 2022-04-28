@@ -1,0 +1,23 @@
+spring:
+  neo4j:
+    uri: bolt://localhost:7687
+    authentication:
+      username: neo4j
+      password: 123456
+  jpa:
+    database-platform: org.hibernate.dialect.Oracle10gDialect
+    open-in-view: true
+    properties:
+      enable_lazy_load_no_trans: true
+#      hibernate:
+#        session_factory:
+#          interceptor: com.example.accessingdataneo4j.config.CustomJPAInterceptor
+#          statement_inspector: com.example.accessingdataneo4j.config.JpaInterceptor
+    hibernate:
+      ddl-auto: update
+
+  datasource:
+    url: jdbc:oracle:thin:@192.168.3.31:1521:orcl
+    driver-class-name: oracle.jdbc.driver.OracleDriver
+    username: orient_collab_admin_503
+    password: orient_collab_admin_503
