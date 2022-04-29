@@ -1,29 +1,34 @@
 
 package com.example.accessingdataneo4j;
 
-import com.example.accessingdataneo4j.model.domain.neo4j.plm.EBOMAsmRelation;
 import com.example.accessingdataneo4j.model.domain.neo4j.plm.EBOMPart;
 import com.example.accessingdataneo4j.model.repository.neo4j.plm.EBOMPartRepository;
+import org.neo4j.driver.internal.value.PathValue;
+import org.neo4j.driver.types.Node;
+import org.neo4j.driver.types.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.neo4j.core.Neo4jTemplate;
 import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import javax.annotation.Resource;
+import java.util.List;
 
 @SpringBootApplication
 @EnableNeo4jRepositories
 @EnableTransactionManagement
 public class AccessingDataNeo4jApplication {
 
+	@Resource
+	Neo4jTemplate neo4jTemplate;
+
 	private final static Logger log = LoggerFactory.getLogger(AccessingDataNeo4jApplication.class);
+
 
 	public static void main(String[] args) throws Exception {
 		SpringApplication.run(AccessingDataNeo4jApplication.class, args);
@@ -63,29 +68,38 @@ public class AccessingDataNeo4jApplication {
 
 
 
+//	private EBOMPart getByItemCode(String itemCode){
+//		String cql = "match(a:EBOMPart)<-->(b) where a.itemCode = \"node_67\" return a,b";
+//
+//	}
+
 	@Bean
 	CommandLineRunner demo(EBOMPartRepository ebomPartRepository){
 		return args -> {
 
-			EBOMPart root = EBOMPart.builder().itemCode("root").name("root").version("A").asmRelations(new HashSet<>()).build();
-			Map<Integer,EBOMPart> partsMap = new HashMap<>();
-			for (int i = 0; i < 10000; i++) {
-				//先
-				partsMap.put(i, EBOMPart.builder().itemCode("node_"+i).name("node_"+i).version("A").asmRelations(new HashSet<>()).build());
-
-			}
-			Set<EBOMAsmRelation> asmRelations = root.getAsmRelations();
-			int index = 0;
-			while (index<10000){
-				java.util.Random random= new  java.util.Random(); // 定义随机类
-				int result = random.nextInt( 10 ); // 返回[0,10)集合中的整数，注意不包括10
-				for (int i = index; i <index + result; i++) {
-					asmRelations.add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(i)).build());
-					index ++;
-				}
-
-			}
-			EBOMPart pcPart = ebomPartRepository.save(root);
+//			Map<Integer,EBOMPart> partsMap = new HashMap<>();
+//			for (int i = 0; i < 10000; i++) {
+//				//先
+//				partsMap.put(i, EBOMPart.builder().itemCode("node_"+i).name("node_"+i).version("A").asmRelations(new HashSet<>()).build());
+//
+//			}
+//			//添加关系
+//			for (int i = 0; i < 10000; i++) {
+//				if((2*i+2)>(10000-1)){
+//					break;
+//				}
+//				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+1)).build());
+//				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+2)).build());
+//			}
+//
+//			EBOMPart head = ebomPartRepository.save(partsMap.get(0));
+			List<EBOMPart> node_67 = ebomPartRepository.queryByItemCode("node_67");
+			List<EBOMPart> children = ebomPartRepository.queryChildrenByItemCode("node_67");
+			List<EBOMPart> children1 = ebomPartRepository.queryChildrenWithRelationByItemCode("node_67");
+			List<PathValue> pathValues = ebomPartRepository.queryPathByItemCode("node_67");
+			Path segments = pathValues.get(0).asPath();
+			Node start = segments.start();
+//			pathValues.get(0).asPath().start().get("name")
 
 
 //			EBOMPart pc = EBOMPart.builder().itemCode("pc").name("办公电脑").version("A").asmRelations(new HashSet<>()).build();
