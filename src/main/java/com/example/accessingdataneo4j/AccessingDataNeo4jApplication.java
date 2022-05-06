@@ -1,11 +1,10 @@
 
 package com.example.accessingdataneo4j;
 
-import com.example.accessingdataneo4j.model.domain.neo4j.plm.EBOMPart;
-import com.example.accessingdataneo4j.model.repository.neo4j.plm.EBOMPartRepository;
-import org.neo4j.driver.internal.value.PathValue;
-import org.neo4j.driver.types.Node;
-import org.neo4j.driver.types.Path;
+import com.example.accessingdataneo4j.model.domain.st.Actor;
+import com.example.accessingdataneo4j.model.domain.st.Movie;
+import com.example.accessingdataneo4j.model.domain.st.Person;
+import com.example.accessingdataneo4j.model.repository.st.MovieRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.CommandLineRunner;
@@ -17,7 +16,7 @@ import org.springframework.data.neo4j.repository.config.EnableNeo4jRepositories;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 import javax.annotation.Resource;
-import java.util.List;
+import java.util.ArrayList;
 
 @SpringBootApplication
 @EnableNeo4jRepositories
@@ -34,6 +33,51 @@ public class AccessingDataNeo4jApplication {
 		SpringApplication.run(AccessingDataNeo4jApplication.class, args);
 		System.exit(0);
 	}
+
+	@Bean
+	CommandLineRunner demo(MovieRepository movieRepository) {
+		return args -> {
+
+		Movie movie = new Movie();
+		movie.setTitle("泰坦尼克号");
+		movie.setDescription("海难，爱情");
+		Person personLi = new Person();
+		personLi.setBorn(1992);
+		personLi.setName("莱昂拉多");
+
+		Person personK = new Person();
+		personK.setBorn(1995);
+		personK.setName("凯特温斯莱特");
+
+		Actor actor1 = new Actor();
+		actor1.setPerson(personLi);
+		actor1.setRoles(new ArrayList<String>() {{
+			add("主演");
+			add("男主角");
+		}});
+		Actor actor2 = new Actor();
+		actor2.setPerson(personK);
+		actor2.setRoles(new ArrayList<String>() {{
+			add("主演");
+			add("女主角");
+		}});
+
+		movie.getActors().add(actor1);
+		movie.getActors().add(actor2);
+
+
+		Person personJ = new Person();
+		personJ.setName("詹姆斯卡梅隆");
+		personJ.setBorn(1965);
+		personJ.getReviewed().add(movie);
+
+		movie.getDirectors().add(personJ);
+
+		movie.getDirectors().add(personJ);
+
+		movieRepository.save(movie);
+	};
+}
 
 //	@Bean
 //	CommandLineRunner demo(EBOMPartRepository ebomPartRepository){
@@ -73,32 +117,32 @@ public class AccessingDataNeo4jApplication {
 //
 //	}
 
-	@Bean
+	/*@Bean
 	CommandLineRunner demo(EBOMPartRepository ebomPartRepository){
 		return args -> {
 
-//			Map<Integer,EBOMPart> partsMap = new HashMap<>();
-//			for (int i = 0; i < 10000; i++) {
-//				//先
-//				partsMap.put(i, EBOMPart.builder().itemCode("node_"+i).name("node_"+i).version("A").asmRelations(new HashSet<>()).build());
+			Map<Integer,EBOMPart> partsMap = new HashMap<>();
+			for (int i = 0; i < 10000; i++) {
+				//先
+				partsMap.put(i, EBOMPart.builder().itemCode("node_"+i).name("node_"+i).version("A").asmRelations(new HashSet<>()).build());
+
+			}
+			//添加关系
+			for (int i = 0; i < 10000; i++) {
+				if((2*i+2)>(10000-1)){
+					break;
+				}
+				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+1)).build());
+				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+2)).build());
+			}
 //
-//			}
-//			//添加关系
-//			for (int i = 0; i < 10000; i++) {
-//				if((2*i+2)>(10000-1)){
-//					break;
-//				}
-//				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+1)).build());
-//				partsMap.get(i).getAsmRelations().add(EBOMAsmRelation.builder().quantity(2L).assembledPart(partsMap.get(2*i+2)).build());
-//			}
-//
-//			EBOMPart head = ebomPartRepository.save(partsMap.get(0));
-			List<EBOMPart> node_67 = ebomPartRepository.queryByItemCode("node_67");
-			List<EBOMPart> children = ebomPartRepository.queryChildrenByItemCode("node_67");
-			List<EBOMPart> children1 = ebomPartRepository.queryChildrenWithRelationByItemCode("node_67");
-			List<PathValue> pathValues = ebomPartRepository.queryPathByItemCode("node_67");
-			Path segments = pathValues.get(0).asPath();
-			Node start = segments.start();
+			EBOMPart head = ebomPartRepository.save(partsMap.get(0));
+//			List<EBOMPart> node_67 = ebomPartRepository.queryByItemCode("node_67");
+//			List<EBOMPart> children = ebomPartRepository.queryChildrenByItemCode("node_67");
+//			List<EBOMPart> children1 = ebomPartRepository.queryChildrenWithRelationByItemCode("node_67");
+//			List<PathValue> pathValues = ebomPartRepository.queryPathByItemCode("node_67");
+//			Path segments = pathValues.get(0).asPath();
+//			Node start = segments.start();
 //			pathValues.get(0).asPath().start().get("name")
 
 
@@ -128,7 +172,7 @@ public class AccessingDataNeo4jApplication {
 //			EBOMPart pcPart = ebomPartRepository.findById("pc").get();
 			System.out.println("######################");
 		};
-	}
+	}*/
 //	@Bean
 //	CommandLineRunner demo(PartRepository partRepository){
 //		return args -> {
